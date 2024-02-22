@@ -1,3 +1,4 @@
+/*
 import { Socket, io } from 'socket.io-client';
 import { getAccessToken } from '../utils/helpers.ts';
 import React from 'react';
@@ -14,3 +15,5 @@ const socket = io(
 );
 const SocketContext = React.createContext<{ socket: Socket }>({ socket });
 export { socket, SocketContext };
+
+*/
