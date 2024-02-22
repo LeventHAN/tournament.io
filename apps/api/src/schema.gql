@@ -1,0 +1,49 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Tournament {
+  id: String!
+  tournamentName: String!
+  currentTournamentBracket: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Player {
+  id: String!
+  username: String!
+  email: String!
+  avatarUrl: String!
+  createdAt: String!
+  updatedAt: String!
+  tournament: Tournament
+}
+
+type Query {
+  tournament(id: String!): Tournament!
+  player(id: String!): Player!
+}
+
+type Mutation {
+  createTournament(createTournamentInput: CreateTournamentInput!): Tournament!
+  updateApi(updatePlayerInput: UpdateTournamentInput!): Player!
+  removeApi(id: String!): Player!
+  createPlayer(createPlayerInput: CreatePlayerInput!): Player!
+}
+
+input CreateTournamentInput {
+  exampleField: String!
+}
+
+input UpdateTournamentInput {
+  exampleField: String
+  id: String!
+}
+
+input CreatePlayerInput {
+  id: String!
+  username: String!
+  email: String!
+  avatarUrl: String!
+}

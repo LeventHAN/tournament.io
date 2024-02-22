@@ -1,0 +1,90 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db.sql"
+}
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//
+// datasource db {
+//   provider     = "mysql"
+//   url          = env("DATABASE_URL")
+//   relationMode = "prisma"
+// }
+//
+
+model Player {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  avatarUrl String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ParticipatedTeams Team[]
+  Tournament        Tournament[]
+  Bracket           Bracket[]
+}
+
+model Team {
+  id       String  @id @default(cuid())
+  player   Player  @relation(fields: [playerId], references: [id])
+  playerId String
+  score    Int
+  Seed     Seed?   @relation(fields: [seedId], references: [id])
+  seedId   String?
+
+  @@index([playerId])
+  @@index([seedId])
+  @@map("teams")
+}
+
+// one piece of bracket is one seed
+model Seed {
+  id        String    @id @default(cuid())
+  date      DateTime? @default(now())
+  teams     Team[]
+  Bracket   Bracket?  @relation(fields: [bracketId], references: [id])
+  bracketId String?
+
+  @@index([bracketId])
+  @@map("seeds")
+}
+
+// one bracket is one round - basically ROUND
+model Bracket {
+  id              String  @id @default(cuid())
+  title           String
+  roundIsFinished Boolean
+  seeds           Seed[]
+
+  bracketWinner Player?     @relation(fields: [playerId], references: [id])
+  playerId      String?
+
+  Tournament    Tournament? @relation(fields: [tournamentId], references: [id])
+  tournamentId  String?
+
+  @@index([playerId])
+  @@index([tournamentId])
+  @@map("brackets")
+}
+
+model Tournament {
+  id                     String                  @id @default(cuid())
+  tournamentParticipants Player[]
+  tournamentName         String
+
+  brackets Bracket[]
+
+  currentTournamentBracket Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tournaments")
+}
+
