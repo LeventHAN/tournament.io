@@ -1,21 +1,36 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { Player } from '../entities/player.entity';
 import { PlayerService } from '../services/player.service';
 import { CreatePlayerInput } from '../dto/create-player.input';
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from '../services/auth.service';
 
 @Resolver(() => Player)
 export class PlayerResolver {
-  constructor(private readonly playerService: PlayerService) {}
+  constructor(
+    private readonly playerService: PlayerService,
+    private readonly authService: AuthService
+  ) {}
 
   @Mutation(() => Player)
   async createPlayer(
-    @Args('createPlayerInput') createPlayerInput: CreatePlayerInput
+    @Args('createPlayerInput') createPlayerInput: CreatePlayerInput,
+    @Context() context
   ) {
-    const existingPlayer = await this.playerService.findOne(
-      createPlayerInput.id
-    );
+    // Get JWT token from request headers
+    const token = context.req.headers.authorization?.split(' ')[1];
+
+    // Verify and decode JWT token to get user ID
+    // You'll need to replace this with your own JWT verification logic
+    const decodedToken = await this.authService.decodeAndVerifyToken(token);
+
+    // Check if the decoded token contains the necessary information
+    if (!decodedToken || !decodedToken.sub) {
+      throw new UnauthorizedException('Invalid or missing JWT token');
+    }
+
+    const existingPlayer = await this.playerService.findOne(decodedToken.sub);
 
     if (existingPlayer) {
       throw new ConflictException('Player with the same ID already exists');

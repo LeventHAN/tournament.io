@@ -7,6 +7,7 @@ import { TournamentService } from './services/tournament.service';
 import { PrismaService } from './prisma/prisma.service';
 import { PlayerResolver } from './resolvers/player.resolver';
 import { PlayerService } from './services/player.service';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PlayerService } from './services/player.service';
     PrismaService,
     PlayerResolver,
     PlayerService,
+    AuthService,
   ],
 })
 export class ApiModule {}

@@ -1,17 +1,37 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { Tournament } from '../entities/tournament.entity';
 import { TournamentService } from '../services/tournament.service';
 import { CreateTournamentInput } from '../dto/create-tournament.input';
+import { AuthService } from '../services/auth.service';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Resolver(() => Tournament)
 export class TournamentResolver {
-  constructor(private readonly tournamentService: TournamentService) {}
+  constructor(
+    private readonly tournamentService: TournamentService,
+    private readonly authService: AuthService
+  ) {}
 
   @Mutation(() => Tournament)
-  createTournament(
-    @Args('createTournamentInput') createTournamentInput: CreateTournamentInput
+  async createTournament(
+    @Args('createTournamentInput') createTournamentInput: CreateTournamentInput,
+    @Context() context
   ) {
+    // Get JWT token from request headers
+    const token = context.req.headers.authorization?.split(' ')[1];
+
+    // Verify and decode JWT token to get user ID
+    // You'll need to replace this with your own JWT verification logic
+    const decodedToken = await this.authService.decodeAndVerifyToken(token);
+
+    // Check if the decoded token contains the necessary information
+    if (!decodedToken || !decodedToken.sub) {
+      throw new UnauthorizedException('Invalid or missing JWT token');
+    }
+
+    createTournamentInput.tournamentHostPlayerId = decodedToken.sub;
+
     return this.tournamentService.create(createTournamentInput);
   }
 

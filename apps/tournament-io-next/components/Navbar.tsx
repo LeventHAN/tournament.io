@@ -14,18 +14,11 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 
 export default function NavbarComponent() {
-  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
   const onChangeTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
     <Navbar>

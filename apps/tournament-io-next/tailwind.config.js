@@ -8,7 +8,11 @@ module.exports = {
     '../../node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        epic_tournament: 'url("/epic_tournament_io.png")',
+      },
+    },
   },
   darkMode: 'class',
   plugins: [
