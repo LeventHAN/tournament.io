@@ -7,7 +7,18 @@ import { PrismaService } from '../prisma/prisma.service';
 export class TournamentService {
   constructor(private prisma: PrismaService) {}
   create(createTournamentInput: CreateTournamentInput) {
-    return 'This action adds a new api';
+    return this.prisma.tournament.create({
+      data: {
+        tournamentName: createTournamentInput.name,
+        currentTournamentBracket: 0,
+        tournamentDescription: createTournamentInput.description,
+        tournamentHostPlayer: {
+          connect: {
+            id: createTournamentInput.tournamentHostPlayerId,
+          },
+        },
+      },
+    });
   }
 
   findAll() {

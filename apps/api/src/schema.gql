@@ -2,14 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Tournament {
-  id: String!
-  tournamentName: String!
-  currentTournamentBracket: Int!
-  createdAt: String!
-  updatedAt: String!
-}
-
 type Player {
   id: String!
   username: String!
@@ -18,6 +10,41 @@ type Player {
   createdAt: String!
   updatedAt: String!
   tournament: Tournament
+}
+
+type Team {
+  id: String!
+  players: [Player!]!
+  score: Int!
+  seed: Seed
+}
+
+type Seed {
+  id: String!
+  date: String!
+  teams: [Team!]!
+  bracket: Bracket!
+  bracketId: String!
+}
+
+type Bracket {
+  id: String!
+  title: String!
+  roundIsFinished: Boolean!
+  seed: Seed
+  winnerPlayer: Player
+  winnerPlayerId: String!
+  tournament: Tournament
+  tournamentId: String!
+}
+
+type Tournament {
+  id: String!
+  tournamentName: String!
+  brackets: [Bracket!]!
+  currentTournamentBracket: Int!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Query {
@@ -33,11 +60,17 @@ type Mutation {
 }
 
 input CreateTournamentInput {
-  exampleField: String!
+  name: String!
+  description: String!
+  gameType: String!
+  tournamentHostPlayerId: String!
 }
 
 input UpdateTournamentInput {
-  exampleField: String
+  name: String
+  description: String
+  gameType: String
+  tournamentHostPlayerId: String
   id: String!
 }
 

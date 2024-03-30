@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { Bracket } from './bracket.entity';
 
 @ObjectType()
 export class Tournament {
@@ -7,6 +8,9 @@ export class Tournament {
 
   @Field(() => String)
   tournamentName: string;
+
+  @Field(() => [Bracket])
+  brackets: Bracket[];
 
   @Field(() => Int)
   currentTournamentBracket: number;

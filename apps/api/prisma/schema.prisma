@@ -26,8 +26,9 @@ model Player {
   updatedAt DateTime @updatedAt
 
   participatedTeams Team[]
-  tournament        Tournament[]
+  tournament        Tournament[] @relation("TournamentParticipants")
   bracket           Bracket[]
+  Tournament        Tournament[]
 }
 
 model Team {
@@ -72,9 +73,16 @@ model Bracket {
 }
 
 model Tournament {
-  id                     String   @id @default(cuid())
-  tournamentParticipants Player[]
-  tournamentName         String
+  id String @id @default(cuid())
+
+  tournamentParticipants Player[] @relation("TournamentParticipants")
+
+  tournamentHostPlayer   Player? @relation(fields: [tournamentHostPlayerId], references: [id])
+  tournamentHostPlayerId String?
+
+  tournamentName String
+
+  tournamentDescription String
 
   brackets Bracket[]
 
