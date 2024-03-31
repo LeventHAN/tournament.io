@@ -1,6 +1,10 @@
 import { gql, request } from 'graphql-request';
 import axios from './axios';
-import { TCreateRoomRequest } from './models';
+import {
+  TCreateRoomRequest,
+  Response,
+  TCreateTournamentResponse,
+} from './models';
 
 export const graphqlFetcher = (query: TODO) =>
   request(`http://localhost:3000/graphql`, query);
@@ -8,7 +12,7 @@ export const graphqlFetcher = (query: TODO) =>
 export const createTournament = async (
   tournamentDetails: TCreateRoomRequest
 ) => {
-  return await axios.post(
+  return await axios.post<Response<TCreateTournamentResponse>>(
     'http://localhost:3000/graphql',
     {
       query: gql`
@@ -45,6 +49,32 @@ export const getTournament = async (tournamentId: string) => {
             updatedAt
             tournamentName
             currentTournamentBracket
+          }
+        }
+      `,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+
+export const addParticipant = async (participantToAdd: {
+  tournamentId: string;
+}) => {
+  return await axios.post(
+    'http://localhost:3000/graphql',
+    {
+      query: gql`
+        mutation {
+          addParticipantToTournament(
+            addParticipantToTournamentInput: {
+              tournamentId: "${participantToAdd.tournamentId}",
+            }
+          ) {
+            id
           }
         }
       `,

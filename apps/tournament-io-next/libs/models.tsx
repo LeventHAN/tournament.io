@@ -9,3 +9,15 @@ export enum EGameType {
   VALORANT = 'Valorant',
   CSGO = 'Counter Strike: Global Offensive',
 }
+
+export type Response<T> = {
+  data: T;
+  errors: any;
+};
+
+export type TCreateTournamentResponse = {
+  createTournament: {
+    id: string;
+    tournamentName: string;
+  };
+};

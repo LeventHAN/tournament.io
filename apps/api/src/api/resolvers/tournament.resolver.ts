@@ -5,6 +5,7 @@ import { TournamentService } from '../services/tournament.service';
 import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { AuthService } from '../services/auth.service';
 import { UnauthorizedException } from '@nestjs/common';
+import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
 
 @Resolver(() => Tournament)
 export class TournamentResolver {
@@ -33,6 +34,54 @@ export class TournamentResolver {
     createTournamentInput.tournamentHostPlayerId = decodedToken.sub;
 
     return this.tournamentService.create(createTournamentInput);
+  }
+
+  @Mutation(() => Tournament)
+  async addParticipantToTournament(
+    @Args('addParticipantToTournamentInput')
+    addParticipantToTournamentInput: AddParticipantToTournamentInput,
+    @Context() context
+  ) {
+    // Get JWT token from request headers
+    const token = context.req.headers.authorization?.split(' ')[1];
+
+    // Verify and decode JWT token to get user ID
+    // You'll need to replace this with your own JWT verification logic
+    const decodedToken = await this.authService.decodeAndVerifyToken(token);
+
+    // Check if the decoded token contains the necessary information
+    if (!decodedToken || !decodedToken.sub) {
+      throw new UnauthorizedException('Invalid or missing JWT token');
+    }
+
+    return this.tournamentService.addParticipant(
+      addParticipantToTournamentInput,
+      decodedToken.sub
+    );
+  }
+
+  @Mutation(() => Tournament)
+  async removeParticipantFromTournament(
+    @Args('removeParticipantFromTournamentInput')
+    removeParticipantFromTournamentInput: AddParticipantToTournamentInput,
+    @Context() context
+  ) {
+    // Get JWT token from request headers
+    const token = context.req.headers.authorization?.split(' ')[1];
+
+    // Verify and decode JWT token to get user ID
+    // You'll need to replace this with your own JWT verification logic
+    const decodedToken = await this.authService.decodeAndVerifyToken(token);
+
+    // Check if the decoded token contains the necessary information
+    if (!decodedToken || !decodedToken.sub) {
+      throw new UnauthorizedException('Invalid or missing JWT token');
+    }
+
+    return this.tournamentService.removeParticipant(
+      removeParticipantFromTournamentInput,
+      decodedToken.sub
+    );
   }
 
   @Query(() => [Tournament], { name: 'tournament' })

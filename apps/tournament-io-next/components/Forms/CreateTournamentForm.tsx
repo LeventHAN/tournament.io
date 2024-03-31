@@ -22,7 +22,7 @@ const roomCreateSchema: z.ZodType<TCreateRoomRequest> = z.object({
 });
 
 interface Props {
-  handleSubmit: (data: TCreateRoomRequest) => void;
+  handleSubmit: (data: TCreateRoomRequest) => Promise<string | undefined>;
 }
 
 const CreateTournamentForm: React.FC<Props> = ({ handleSubmit }) => {
@@ -39,12 +39,15 @@ const CreateTournamentForm: React.FC<Props> = ({ handleSubmit }) => {
   });
 
   // const navigate = useNavigate();
-  const handleFormSubmit = (data: TCreateRoomRequest) => {
+  const handleFormSubmit = async (data: TCreateRoomRequest) => {
     alert(JSON.stringify(data, null, 2));
     // onSubmit(data);
-    handleSubmit(data);
-    methods.reset();
-    alert('Tournament created!');
+    const tournamentId = await handleSubmit(data);
+    if (tournamentId) {
+      methods.reset();
+      router.push(`/tournament/${tournamentId}`);
+      alert('Tournament created!');
+    }
   };
 
   return (

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { PrismaService } from '../prisma/prisma.service';
+import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
 
 @Injectable()
 export class TournamentService {
@@ -15,6 +16,38 @@ export class TournamentService {
         tournamentHostPlayer: {
           connect: {
             id: createTournamentInput.tournamentHostPlayerId,
+          },
+        },
+      },
+    });
+  }
+
+  addParticipant(
+    addParticipantToTournamentInput: AddParticipantToTournamentInput,
+    playerId: string
+  ) {
+    return this.prisma.tournament.update({
+      where: { id: addParticipantToTournamentInput.tournamentId },
+      data: {
+        tournamentParticipants: {
+          connect: {
+            id: playerId,
+          },
+        },
+      },
+    });
+  }
+
+  removeParticipant(
+    removeParticipantFromTournamentInput: AddParticipantToTournamentInput,
+    playerId: string
+  ) {
+    return this.prisma.tournament.update({
+      where: { id: removeParticipantFromTournamentInput.tournamentId },
+      data: {
+        tournamentParticipants: {
+          disconnect: {
+            id: playerId,
           },
         },
       },

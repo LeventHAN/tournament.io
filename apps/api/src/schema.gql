@@ -54,6 +54,8 @@ type Query {
 
 type Mutation {
   createTournament(createTournamentInput: CreateTournamentInput!): Tournament!
+  addParticipantToTournament(addParticipantToTournamentInput: AddParticipantToTournamentInput!): Tournament!
+  removeParticipantFromTournament(removeParticipantFromTournamentInput: AddParticipantToTournamentInput!): Tournament!
   updateApi(updatePlayerInput: UpdateTournamentInput!): Player!
   removeApi(id: String!): Player!
   createPlayer(createPlayerInput: CreatePlayerInput!): Player!
@@ -64,6 +66,10 @@ input CreateTournamentInput {
   description: String!
   gameType: String!
   tournamentHostPlayerId: String!
+}
+
+input AddParticipantToTournamentInput {
+  tournamentId: String!
 }
 
 input UpdateTournamentInput {
