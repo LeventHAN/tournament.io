@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./db.sql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // This is your Prisma schema file,
@@ -82,7 +82,7 @@ model Tournament {
 
   tournamentName String
 
-  tournamentDescription String
+  tournamentDescription Json[] @db.JsonB
 
   brackets Bracket[]
 

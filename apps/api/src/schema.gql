@@ -41,11 +41,18 @@ type Bracket {
 type Tournament {
   id: String!
   tournamentName: String!
+  tournamentDescription: JSON
   brackets: [Bracket!]!
   currentTournamentBracket: Int!
+  tournamentParticipants: [Player!]!
   createdAt: String!
   updatedAt: String!
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 type Query {
   tournament(id: String!): Tournament!
@@ -53,19 +60,11 @@ type Query {
 }
 
 type Mutation {
-  createTournament(createTournamentInput: CreateTournamentInput!): Tournament!
   addParticipantToTournament(addParticipantToTournamentInput: AddParticipantToTournamentInput!): Tournament!
   removeParticipantFromTournament(removeParticipantFromTournamentInput: AddParticipantToTournamentInput!): Tournament!
   updateApi(updatePlayerInput: UpdateTournamentInput!): Player!
   removeApi(id: String!): Player!
   createPlayer(createPlayerInput: CreatePlayerInput!): Player!
-}
-
-input CreateTournamentInput {
-  name: String!
-  description: String!
-  gameType: String!
-  tournamentHostPlayerId: String!
 }
 
 input AddParticipantToTournamentInput {
@@ -74,7 +73,7 @@ input AddParticipantToTournamentInput {
 
 input UpdateTournamentInput {
   name: String
-  description: String
+  description: [JSON!]
   gameType: String
   tournamentHostPlayerId: String
   id: String!

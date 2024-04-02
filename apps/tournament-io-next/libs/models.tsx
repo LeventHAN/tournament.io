@@ -1,6 +1,12 @@
 export type TCreateRoomRequest = {
   name: string;
-  description: string;
+  description: {
+    type: string;
+    content: Array<{
+      type: string;
+      content: Array<{ type: string; text: string }>;
+    }>;
+  };
   gameType: string;
 };
 
