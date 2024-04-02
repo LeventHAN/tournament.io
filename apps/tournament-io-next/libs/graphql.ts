@@ -13,27 +13,8 @@ export const createTournament = async (
   tournamentDetails: TCreateRoomRequest
 ) => {
   return await axios.post<Response<TCreateTournamentResponse>>(
-    'http://localhost:3000/graphql',
-    {
-      query: gql`
-      mutation {
-        createTournament(createTournamentInput: {
-          name: "${tournamentDetails.name}",
-          description: "${tournamentDetails.description}",
-          gameType: "${tournamentDetails.gameType}"
-          tournamentHostPlayerId: "flagged_id"
-        }) {
-          id,
-          tournamentName
-        }
-      }
-      `,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
+    'http://localhost:3000/api/tournament/createTournament',
+    tournamentDetails
   );
 };
 
