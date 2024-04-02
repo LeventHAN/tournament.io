@@ -3,6 +3,7 @@ import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class TournamentService {
@@ -12,7 +13,7 @@ export class TournamentService {
       data: {
         tournamentName: createTournamentInput.name,
         currentTournamentBracket: 0,
-        tournamentDescription: createTournamentInput.description,
+        tournamentDescription: [createTournamentInput.description],
         tournamentHostPlayer: {
           connect: {
             id: createTournamentInput.tournamentHostPlayerId,
@@ -61,6 +62,11 @@ export class TournamentService {
   findOne(id: string) {
     return this.prisma.tournament.findUnique({
       where: { id: id },
+      include: {
+        brackets: true,
+        tournamentParticipants: true,
+        tournamentHostPlayer: true,
+      },
     });
   }
 

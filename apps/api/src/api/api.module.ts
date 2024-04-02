@@ -8,6 +8,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { PlayerResolver } from './resolvers/player.resolver';
 import { PlayerService } from './services/player.service';
 import { AuthService } from './services/auth.service';
+import { TournamentController } from './rest/tournament';
 
 @Module({
   imports: [
@@ -25,5 +26,6 @@ import { AuthService } from './services/auth.service';
     PlayerService,
     AuthService,
   ],
+  controllers: [TournamentController],
 })
 export class ApiModule {}
