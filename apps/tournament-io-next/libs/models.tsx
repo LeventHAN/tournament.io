@@ -20,6 +20,11 @@ export enum EGameType {
   CSGO = 'Counter Strike: Global Offensive',
 }
 
+export type ResponseGraphQL<T> = {
+  data: T;
+  errors: any;
+};
+
 export type TCreateTournamentResponse = {
   id: string;
   tournamentHostPlayerId: string;
@@ -28,4 +33,10 @@ export type TCreateTournamentResponse = {
   currentTournamentBracket: number;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AddParticipantToTournamentResponse = {
+  addParticipantToTournament: {
+    id: string;
+  };
 };

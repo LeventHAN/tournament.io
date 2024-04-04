@@ -47,7 +47,12 @@ const handleJoinTournament = async (tournamentId: string) => {
     tournamentId: tournamentId,
   });
 
-  console.log({ data });
+  const succeed = data?.data?.addParticipantToTournament?.id;
+
+  if (succeed) {
+    alert('You joined successfully');
+    // messaging ?  or  websocket ?
+  }
 };
 
 export default async function Page() {
