@@ -4,7 +4,11 @@ import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { EGameType, TCreateRoomRequest } from '@/libs/models';
+import {
+  EGameType,
+  TCreateRoomRequest,
+  TCreateTournamentResponse,
+} from '@/libs/models';
 import { Input, Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import { TbSquareRoundedArrowLeftFilled, TbTournament } from 'react-icons/tb';
@@ -221,7 +225,9 @@ const extensions = [
 ];
 
 interface Props {
-  handleSubmit: (data: TCreateRoomRequest) => Promise<string | undefined>;
+  handleSubmit: (
+    data: TCreateRoomRequest
+  ) => Promise<TCreateTournamentResponse>;
 }
 
 const CreateTournamentForm: React.FC<Props> = ({ handleSubmit }) => {
@@ -253,7 +259,8 @@ const CreateTournamentForm: React.FC<Props> = ({ handleSubmit }) => {
 
   // const navigate = useNavigate();
   const handleFormSubmit = async (data: TCreateRoomRequest) => {
-    const tournamentId = await handleSubmit(
+    // below is needed due nextjs server serialization
+    const { id } = await handleSubmit(
       JSON.parse(
         JSON.stringify({
           ...data,
@@ -264,9 +271,9 @@ const CreateTournamentForm: React.FC<Props> = ({ handleSubmit }) => {
         })
       )
     );
-    if (tournamentId) {
+    if (id) {
       methods.reset();
-      router.push(`/tournament/queue/${tournamentId}`);
+      router.push(`/tournament/queue/${id}`);
       alert('Tournament created!');
     }
   };

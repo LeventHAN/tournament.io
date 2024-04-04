@@ -7,12 +7,7 @@ const handleFormSubmit = async (createRoomData: TCreateRoomRequest) => {
 
   const { data } = await createTournament(createRoomData);
 
-  console.log({ responseee: data.errors });
-
-  const tournamentId = data?.data?.createTournament?.id;
-  console.log({ tournamentId });
-
-  return tournamentId;
+  return data;
 };
 
 export default async function CreateRoom() {

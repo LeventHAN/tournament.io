@@ -1,12 +1,16 @@
+export type RichTextContentJSON = {
+  [key: string]: any;
+  type: string;
+  content: Array<{
+    [key: string]: any;
+    type: string;
+    content: Array<{ type: string; text: string }>;
+  }>;
+};
+
 export type TCreateRoomRequest = {
   name: string;
-  description: {
-    type: string;
-    content: Array<{
-      type: string;
-      content: Array<{ type: string; text: string }>;
-    }>;
-  };
+  description: RichTextContentJSON;
   gameType: string;
 };
 
@@ -16,14 +20,12 @@ export enum EGameType {
   CSGO = 'Counter Strike: Global Offensive',
 }
 
-export type Response<T> = {
-  data: T;
-  errors: any;
-};
-
 export type TCreateTournamentResponse = {
-  createTournament: {
-    id: string;
-    tournamentName: string;
-  };
+  id: string;
+  tournamentHostPlayerId: string;
+  tournamentName: string;
+  tournamentDescription: Array<RichTextContentJSON>;
+  currentTournamentBracket: number;
+  createdAt: string;
+  updatedAt: string;
 };

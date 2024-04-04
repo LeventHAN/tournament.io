@@ -1,10 +1,6 @@
 import { gql, request } from 'graphql-request';
 import axios from './axios';
-import {
-  TCreateRoomRequest,
-  Response,
-  TCreateTournamentResponse,
-} from './models';
+import { TCreateRoomRequest, TCreateTournamentResponse } from './models';
 
 export const graphqlFetcher = (query: TODO) =>
   request(`http://localhost:3000/graphql`, query);
@@ -12,7 +8,7 @@ export const graphqlFetcher = (query: TODO) =>
 export const createTournament = async (
   tournamentDetails: TCreateRoomRequest
 ) => {
-  return await axios.post<Response<TCreateTournamentResponse>>(
+  return await axios.post<TCreateTournamentResponse>(
     'http://localhost:3000/api/tournament/createTournament',
     tournamentDetails
   );
