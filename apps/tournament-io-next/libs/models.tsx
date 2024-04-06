@@ -33,10 +33,39 @@ export type TCreateTournamentResponse = {
   currentTournamentBracket: number;
   createdAt: string;
   updatedAt: string;
+  brackets: {
+    id: string;
+    title: string;
+    roundIsFinished: boolean;
+    winnerPlayer: {
+      id: string;
+      username: string;
+      avatarUrl: string;
+    };
+    tournament: {
+      id: string;
+      tournamentName: string;
+    };
+  }[];
+  tournamentParticipants: {
+    id: string;
+    username: string;
+    avatarUrl: string;
+  }[];
+};
+
+export type GetTournamentById = {
+  tournament: TCreateTournamentResponse;
 };
 
 export type AddParticipantToTournamentResponse = {
   addParticipantToTournament: {
+    id: string;
+  };
+};
+
+export type RemoveParticipantToTournamentResponse = {
+  removeParticipantToTournament: {
     id: string;
   };
 };

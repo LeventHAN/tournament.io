@@ -1,13 +1,11 @@
 import axios from 'axios';
-import { auth } from '@clerk/nextjs';
+import { getAuthToken } from '../utils/helpers';
 
 axios.defaults.baseURL = 'http://localhost:3000';
 
 axios.interceptors.request.use(
   async (config) => {
-    const { getToken } = auth();
-    const access_token = await getToken();
-    console.log({ access_token });
+    const access_token = await getAuthToken();
     if (access_token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       config.headers['Authorization'] = `Bearer ${access_token}`;

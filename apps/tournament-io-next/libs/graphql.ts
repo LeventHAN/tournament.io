@@ -2,6 +2,8 @@ import { gql, request } from 'graphql-request';
 import axios from './axios';
 import {
   AddParticipantToTournamentResponse,
+  GetTournamentById,
+  RemoveParticipantToTournamentResponse,
   ResponseGraphQL,
   TCreateRoomRequest,
   TCreateTournamentResponse,
@@ -20,7 +22,7 @@ export const createTournament = async (
 };
 
 export const getTournament = async (tournamentId: string) => {
-  return await axios.post(
+  return await axios.post<ResponseGraphQL<GetTournamentById>>(
     'http://localhost:3000/graphql',
     {
       query: gql`
@@ -29,8 +31,11 @@ export const getTournament = async (tournamentId: string) => {
             id
             createdAt
             updatedAt
+            tournamentDescription
             tournamentName
             currentTournamentBracket
+            brackets { id, title, roundIsFinished, winnerPlayer { id, username, avatarUrl }, tournament {id, tournamentName} }
+            tournamentParticipants { id, username, avatarUrl }
           }
         }
       `,
@@ -53,6 +58,34 @@ export const addParticipant = async (participantToAdd: {
         mutation {
           addParticipantToTournament(
             addParticipantToTournamentInput: {
+              tournamentId: "${participantToAdd.tournamentId}",
+            }
+          ) {
+            id
+          }
+        }
+      `,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+
+export const removeParticipant = async (participantToAdd: {
+  tournamentId: string;
+}) => {
+  return await axios.post<
+    ResponseGraphQL<RemoveParticipantToTournamentResponse>
+  >(
+    'http://localhost:3000/graphql',
+    {
+      query: gql`
+        mutation {
+          removeParticipantFromTournament(
+            removeParticipantFromTournamentInput: {
               tournamentId: "${participantToAdd.tournamentId}",
             }
           ) {

@@ -1,5 +1,10 @@
-import { addParticipant } from '@/libs/graphql';
+import {
+  addParticipant,
+  getTournament,
+  removeParticipant,
+} from '@/libs/graphql';
 import ParticipantsContainer from '@/components/Containers/ParticipantsContainer';
+import { TCreateTournamentResponse } from '@/libs/models';
 
 export interface Participant {
   avatarUrl: string;
@@ -50,12 +55,53 @@ const handleJoinTournament = async (tournamentId: string) => {
   const succeed = data?.data?.addParticipantToTournament?.id;
 
   if (succeed) {
-    alert('You joined successfully');
+    // refresh component
+    console.log('Participant added to tournament');
+
     // messaging ?  or  websocket ?
   }
+
+  return !!succeed;
 };
 
-export default async function Page() {
+const handleLeaveTournament = async (tournamentId: string) => {
+  'use server';
+
+  const { data } = await removeParticipant({
+    tournamentId: tournamentId,
+  });
+
+  const succeed = data?.data?.removeParticipantToTournament?.id;
+
+  if (succeed) {
+    // refresh component
+    console.log('Participant left the tournament');
+
+    // messaging ?  or  websocket ?
+  }
+
+  return !!succeed;
+};
+
+const fetchTournamentById = async (tournamentId: string) => {
+  'use server';
+
+  const { data } = await getTournament(tournamentId);
+
+  return data?.data.tournament;
+};
+
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function Page({ params }: Props) {
+  const tournamentId = params.slug;
+
+  // const tournament = await fetchTournamentById(tournamentId);
+
   return (
     <>
       <div className="flex h-screen bg-epic_tournament bg-fixed bg-cover">
@@ -63,6 +109,7 @@ export default async function Page() {
           <div className="grid grid-cols-12 gap-4">
             <ParticipantsContainer
               handleJoinTournament={handleJoinTournament}
+              handleLeaveTournament={handleLeaveTournament}
             />
           </div>
         </div>

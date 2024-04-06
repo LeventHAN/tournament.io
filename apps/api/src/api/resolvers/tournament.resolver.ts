@@ -2,10 +2,10 @@ import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { Tournament } from '../entities/tournament.entity';
 import { TournamentService } from '../services/tournament.service';
-import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { AuthService } from '../services/auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
+import { RemoveParticipantFromTournamentInput } from '../dto/remove-participant-from-tournament.input';
 
 @Resolver(() => Tournament)
 export class TournamentResolver {
@@ -41,7 +41,7 @@ export class TournamentResolver {
   @Mutation(() => Tournament)
   async removeParticipantFromTournament(
     @Args('removeParticipantFromTournamentInput')
-    removeParticipantFromTournamentInput: AddParticipantToTournamentInput,
+    removeParticipantFromTournamentInput: RemoveParticipantFromTournamentInput,
     @Context() context
   ) {
     // Get JWT token from request headers
