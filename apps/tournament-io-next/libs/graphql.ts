@@ -36,6 +36,7 @@ export const getTournament = async (tournamentId: string) => {
             currentTournamentBracket
             brackets { id, title, roundIsFinished, winnerPlayer { id, username, avatarUrl }, tournament {id, tournamentName} }
             tournamentParticipants { id, username, avatarUrl }
+            tournamentHostPlayer { id, username, avatarUrl }
           }
         }
       `,

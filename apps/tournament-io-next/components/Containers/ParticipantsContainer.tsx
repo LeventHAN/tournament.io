@@ -10,11 +10,12 @@ import { useParams } from 'next/navigation';
 import { TCreateTournamentResponse } from '@/libs/models';
 import { useUser } from '@clerk/nextjs';
 import { getTournament } from '../../libs/graphql';
-import { EditorContent, EditorProvider, useEditor } from '@tiptap/react';
+import { EditorProvider } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import ListItem from '@tiptap/extension-list-item';
 import TextStyle from '@tiptap/extension-text-style';
+import { TbGhost } from 'react-icons/tb';
 
 interface ParticipantsContainerProps {
   // Define your component props here
@@ -88,8 +89,13 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
 
   return (
     // Parent has classname: grid grid-cols-12 gap-4
-    <div className="col-span-12 grid grid-cols-12 gap-4 p-2">
+    <div className="col-span-12 grid grid-cols-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12  gap-4 p-2">
       <div className="col-span-6 max-h-unit-9xl overflow-auto p-8 bg-slate-400 bg-opacity-45 rounded-md">
+        <div>
+          <h1 className="text-3xl font-bold text-sky-300 mb-4">
+            {tournamentData.tournamentName}
+          </h1>
+        </div>
         <div>
           {tournamentData?.tournamentDescription[0] && (
             <EditorProvider
@@ -102,6 +108,34 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
       </div>
       <div className="col-span-6">
         <div>
+          <div className="flex-row justify-between items-center">
+            <Seed
+              style={{ fontSize: 18 }}
+              className="min-w-full max-w-unit-9xl flex-row justify-between items-center"
+            >
+              <SeedItem>
+                <div className="p-2.5 min-w-[100px] md:min-w-[200px] grid content-center min-h[100px] divide-dashed">
+                  <span className="font-medium text-sky-300 mb-2">
+                    Tournament Host
+                  </span>
+                  <SeedTeam className="cursor-pointer">
+                    <span className="grid grid-cols-12 gap-2 divide-x-2 divide-double divide-[#fc3908e0]">
+                      <div className="col-span-1 py-2 font-bold text-gray-500 mr-4">
+                        <TbGhost scale={1.5} />
+                      </div>
+                      <div className="col-span-8 flex items-center gap-2 px-4">
+                        <Avatar
+                          size="sm"
+                          src={tournamentData.tournamentHostPlayer.avatarUrl}
+                        />
+                        {truncate(tournamentData.tournamentHostPlayer.username)}
+                      </div>
+                    </span>
+                  </SeedTeam>
+                </div>
+              </SeedItem>
+            </Seed>
+          </div>
           <div className="flex-row justify-between items-center">
             <Seed style={{ fontSize: 15 }} className="min-w-full">
               <SeedItem>
@@ -143,7 +177,8 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
               </SeedItem>
             </Seed>
           </div>
-          <div className="flex-row justify-between items-center px-8 space-x-24 lg:space-x-unit-80 text-xs md:text-base">
+
+          <div className="flex-row flex justify-between items-center px-8 text-xs md:text-base">
             <div className="order-1">
               <Button className="text-xs md:text-base" disabled>
                 <IoPersonAdd />{' '}

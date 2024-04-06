@@ -24,6 +24,9 @@ export class Tournament {
   @Field(() => [Player])
   tournamentParticipants?: Player[];
 
+  @Field(() => Player)
+  tournamentHostPlayer: Player;
+
   @Field(() => String)
   createdAt: string;
   @Field(() => String)

@@ -45,6 +45,7 @@ type Tournament {
   brackets: [Bracket!]!
   currentTournamentBracket: Int!
   tournamentParticipants: [Player!]!
+  tournamentHostPlayer: Player!
   createdAt: String!
   updatedAt: String!
 }

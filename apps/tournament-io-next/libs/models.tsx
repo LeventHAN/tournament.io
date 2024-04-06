@@ -27,7 +27,11 @@ export type ResponseGraphQL<T> = {
 
 export type TCreateTournamentResponse = {
   id: string;
-  tournamentHostPlayerId: string;
+  tournamentHostPlayer: {
+    id: string;
+    username: string;
+    avatarUrl: string;
+  };
   tournamentName: string;
   tournamentDescription: Array<RichTextContentJSON>;
   currentTournamentBracket: number;
