@@ -17,9 +17,7 @@ class WebSocketSingleton {
   }
 
   public async connect(): Promise<Socket> {
-    console.log('Connecting to WebSocket server');
     if (!this.socket) {
-      console.log('Creating new WebSocket connection');
       const accessToken = await getAuthToken();
       const userId = await getUserId();
       this.socket = io('http://localhost:3000', {
