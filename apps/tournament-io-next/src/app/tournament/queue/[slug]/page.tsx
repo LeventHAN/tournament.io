@@ -1,10 +1,5 @@
-import {
-  addParticipant,
-  getTournament,
-  removeParticipant,
-} from '@/libs/graphql';
+import { addParticipant, removeParticipant } from '@/libs/graphql';
 import ParticipantsContainer from '@/components/Containers/ParticipantsContainer';
-import { TCreateTournamentResponse } from '@/libs/models';
 
 export interface Participant {
   avatarUrl: string;
@@ -66,22 +61,7 @@ const handleLeaveTournament = async (tournamentId: string) => {
 
   const succeed = data?.data?.removeParticipantToTournament?.id;
 
-  if (succeed) {
-    // refresh component
-    console.log('Participant left the tournament');
-
-    // messaging ?  or  websocket ?
-  }
-
   return !!succeed;
-};
-
-const fetchTournamentById = async (tournamentId: string) => {
-  'use server';
-
-  const { data } = await getTournament(tournamentId);
-
-  return data?.data.tournament;
 };
 
 type Props = {
@@ -91,10 +71,6 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const tournamentId = params.slug;
-
-  // const tournament = await fetchTournamentById(tournamentId);
-
   return (
     <>
       <div className="flex h-screen bg-epic_tournament bg-fixed bg-cover">
