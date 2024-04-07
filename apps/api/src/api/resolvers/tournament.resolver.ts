@@ -6,12 +6,14 @@ import { AuthService } from '../services/auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
 import { RemoveParticipantFromTournamentInput } from '../dto/remove-participant-from-tournament.input';
+import { MyWebSocketGateway } from '../websocket.gateway';
 
 @Resolver(() => Tournament)
 export class TournamentResolver {
   constructor(
     private readonly tournamentService: TournamentService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly socketGateway: MyWebSocketGateway
   ) {}
 
   @Mutation(() => Tournament)
@@ -32,10 +34,16 @@ export class TournamentResolver {
       throw new UnauthorizedException('Invalid or missing JWT token');
     }
 
-    return this.tournamentService.addParticipant(
+    const res = await this.tournamentService.addParticipant(
       addParticipantToTournamentInput,
       decodedToken.sub
     );
+
+    this.socketGateway.server.emit('tournament:newParticipant', {
+      tournamentId: res.id,
+    });
+
+    return res;
   }
 
   @Mutation(() => Tournament)
@@ -56,10 +64,16 @@ export class TournamentResolver {
       throw new UnauthorizedException('Invalid or missing JWT token');
     }
 
-    return this.tournamentService.removeParticipant(
+    const res = await this.tournamentService.removeParticipant(
       removeParticipantFromTournamentInput,
       decodedToken.sub
     );
+
+    this.socketGateway.server.emit('tournament:newParticipant', {
+      tournamentId: res.id,
+    });
+
+    return res;
   }
 
   @Query(() => [Tournament], { name: 'tournament' })

@@ -54,13 +54,6 @@ const handleJoinTournament = async (tournamentId: string) => {
 
   const succeed = data?.data?.addParticipantToTournament?.id;
 
-  if (succeed) {
-    // refresh component
-    console.log('Participant added to tournament');
-
-    // messaging ?  or  websocket ?
-  }
-
   return !!succeed;
 };
 

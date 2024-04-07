@@ -16,7 +16,7 @@ import Color from '@tiptap/extension-color';
 import ListItem from '@tiptap/extension-list-item';
 import TextStyle from '@tiptap/extension-text-style';
 import { TbGhost } from 'react-icons/tb';
-import { useWebSocketContext } from '../WebSocketContext';
+import { socket } from '../../src/socket';
 
 interface ParticipantsContainerProps {
   // Define your component props here
@@ -35,8 +35,6 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
   const { slug } = useParams();
   const currentLoggedInUser = useUser();
 
-  const webSocket = useWebSocketContext();
-
   const [tournamentData, setTournamentData] =
     useState<TCreateTournamentResponse | null>(null);
 
@@ -48,31 +46,17 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
 
     fetchTournamentData();
 
+    const onNewParticipant = () => {
+      fetchTournamentData();
+    };
+
+    socket.on('tournament:newParticipant', onNewParticipant);
+
     return () => {
       setTournamentData(null);
+      socket.off('tournament:newParticipant', onNewParticipant);
     };
   }, []);
-
-  useEffect(() => {
-    const handleWsConnection = () => {
-      if (webSocket) {
-        webSocket.onopen = () => {
-          console.log('WebSocket Client Connected');
-        };
-        webSocket.onmessage = (message) => {
-          console.log(message.data);
-        };
-      }
-    };
-
-    handleWsConnection();
-
-    return () => {
-      if (webSocket) {
-        webSocket.close();
-      }
-    };
-  });
 
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -167,7 +151,7 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
           <div className="flex-row justify-between items-center">
             <Seed style={{ fontSize: 15 }} className="min-w-full">
               <SeedItem>
-                <div className="p-2.5 min-w-[300px] md:min-w-[400px] grid content-center min-h[300px] divide-y-2 divide-dashed divide-[#08cbfce0]">
+                <div className="p-2.5 min-w-[300px] md:min-w-[300px] grid content-center min-h[300px] divide-y-1 divide-dashed divide-[#08cbfce0]">
                   <span className="font-medium text-sky-300 mb-4">
                     Participants List
                   </span>
@@ -181,9 +165,9 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
                                 backgroundColor:
                                   userIndex % 2 ? '#08cbfce0' : '',
                               }}
-                              className="cursor-pointer"
+                              className="cursor-pointer -p-2 m-[0.6]"
                             >
-                              <span className="grid grid-cols-12 gap-2 divide-x-2 divide-double divide-[#08cbfce0]">
+                              <span className="grid grid-cols-12 gap-2 divide-x-2 divide-double divide-[#08cbfce0] -p-4">
                                 <div className="col-span-1 py-2 font-bold text-gray-500 mr-4">
                                   {userIndex}
                                 </div>

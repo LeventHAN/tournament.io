@@ -1,18 +1,50 @@
 'use client';
 
 import { NextUIProvider } from '@nextui-org/react';
-import {} from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import { WebSocketProvider } from '@/components/WebSocketContext';
-import useWebSocket from '@/utils/useWebSocket';
+import React, { useEffect, useState } from 'react';
+import { socket } from '../socket';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const webSocket = useWebSocket();
+  const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState('N/A');
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect();
+    }
+
+    function onConnect() {
+      setIsConnected(true);
+      setTransport(socket.io.engine.transport.name);
+
+      socket.io.engine.on('upgrade', (transport) => {
+        setTransport(transport.name);
+      });
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+      setTransport('N/A');
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+    };
+  }, []);
 
   return (
     <NextUIProvider>
       <NextThemesProvider attribute="class" defaultTheme="dark">
-        <WebSocketProvider webSocket={webSocket}>{children}</WebSocketProvider>
+        <div>
+          <p>Status: {isConnected ? 'connected' : 'disconnected'}</p>
+          <p>Transport: {transport}</p>
+        </div>
+        {children}
       </NextThemesProvider>
     </NextUIProvider>
   );

@@ -6,7 +6,6 @@ import { LayoutHome } from '@/containers/home-page/layout-section';
 import { BackgroundRaster } from '@/components/Background/BackgroundRaster';
 
 export default async function Index() {
-  // <Hero />
   return (
     <>
       <LayoutHome>
