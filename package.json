@@ -16,6 +16,7 @@
     "@nestjs/core": "^10.0.2",
     "@nestjs/graphql": "^12.0.11",
     "@nestjs/platform-express": "^10.0.2",
+    "@nestjs/platform-socket.io": "^10.3.7",
     "@nextui-org/react": "^2.2.9",
     "@prisma/client": "^5.9.1",
     "@supabase/auth-helpers-nextjs": "^0.9.0",
@@ -47,6 +48,7 @@
     "react-icons": "^5.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
+    "socket.io-client": "^4.7.5",
     "swr": "^2.2.4",
     "tslib": "^2.3.0",
     "zod": "^3.22.4"

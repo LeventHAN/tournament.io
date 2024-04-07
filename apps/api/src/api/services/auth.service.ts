@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import * as jwksClient from 'jwks-rsa';
 
@@ -13,7 +13,7 @@ export class AuthService {
     const decodedToken = jwt.decode(token, { complete: true });
 
     if (!decodedToken || !decodedToken.header || !decodedToken.header.kid) {
-      throw new Error('Invalid decoded token');
+      throw new UnauthorizedException('Invalid decoded token');
     }
 
     const key = await this.getSigningKey(decodedToken.header.kid);
@@ -23,7 +23,7 @@ export class AuthService {
     try {
       return jwt.verify(token, publicKey);
     } catch (error) {
-      throw new Error('Invalid token signature');
+      throw new UnauthorizedException('Invalid token signature');
     }
   }
 

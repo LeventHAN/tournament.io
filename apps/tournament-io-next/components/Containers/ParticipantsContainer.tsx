@@ -16,6 +16,7 @@ import Color from '@tiptap/extension-color';
 import ListItem from '@tiptap/extension-list-item';
 import TextStyle from '@tiptap/extension-text-style';
 import { TbGhost } from 'react-icons/tb';
+import { useWebSocketContext } from '../WebSocketContext';
 
 interface ParticipantsContainerProps {
   // Define your component props here
@@ -34,6 +35,8 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
   const { slug } = useParams();
   const currentLoggedInUser = useUser();
 
+  const webSocket = useWebSocketContext();
+
   const [tournamentData, setTournamentData] =
     useState<TCreateTournamentResponse | null>(null);
 
@@ -49,6 +52,27 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
       setTournamentData(null);
     };
   }, []);
+
+  useEffect(() => {
+    const handleWsConnection = () => {
+      if (webSocket) {
+        webSocket.onopen = () => {
+          console.log('WebSocket Client Connected');
+        };
+        webSocket.onmessage = (message) => {
+          console.log(message.data);
+        };
+      }
+    };
+
+    handleWsConnection();
+
+    return () => {
+      if (webSocket) {
+        webSocket.close();
+      }
+    };
+  });
 
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -108,33 +132,37 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
       </div>
       <div className="col-span-6">
         <div>
-          <div className="flex-row justify-between items-center">
-            <Seed
-              style={{ fontSize: 18 }}
-              className="min-w-full max-w-unit-9xl flex-row justify-between items-center"
-            >
-              <SeedItem>
-                <div className="p-2.5 min-w-[100px] md:min-w-[200px] grid content-center min-h[100px] divide-dashed">
-                  <span className="font-medium text-sky-300 mb-2">
-                    Tournament Host
-                  </span>
-                  <SeedTeam className="cursor-pointer">
-                    <span className="grid grid-cols-12 gap-2 divide-x-2 divide-double divide-[#fc3908e0]">
-                      <div className="col-span-1 py-2 font-bold text-gray-500 mr-4">
-                        <TbGhost scale={1.5} />
-                      </div>
-                      <div className="col-span-8 flex items-center gap-2 px-4">
-                        <Avatar
-                          size="sm"
-                          src={tournamentData.tournamentHostPlayer.avatarUrl}
-                        />
-                        {truncate(tournamentData.tournamentHostPlayer.username)}
-                      </div>
+          <div className="flex justify-center items-center">
+            <div className="text-center">
+              <Seed
+                style={{ fontSize: 18 }}
+                className="min-w-full max-w-unit-9xl flex-row justify-between items-center"
+              >
+                <SeedItem>
+                  <div className="p-2.5 min-w-[100px] md:min-w-[200px] grid content-center min-h[100px] divide-dashed">
+                    <span className="font-medium text-sky-300 mb-2">
+                      Tournament Host
                     </span>
-                  </SeedTeam>
-                </div>
-              </SeedItem>
-            </Seed>
+                    <SeedTeam className="cursor-pointer">
+                      <span className="grid grid-cols-12 gap-2 divide-x-2 divide-double divide-[#fc3908e0]">
+                        <div className="col-span-1 py-2 font-bold text-gray-500 mr-4">
+                          <TbGhost scale={1.5} />
+                        </div>
+                        <div className="col-span-8 flex items-center gap-2 px-4">
+                          <Avatar
+                            size="sm"
+                            src={tournamentData.tournamentHostPlayer.avatarUrl}
+                          />
+                          {truncate(
+                            tournamentData.tournamentHostPlayer.username
+                          )}
+                        </div>
+                      </span>
+                    </SeedTeam>
+                  </div>
+                </SeedItem>
+              </Seed>
+            </div>
           </div>
           <div className="flex-row justify-between items-center">
             <Seed style={{ fontSize: 15 }} className="min-w-full">

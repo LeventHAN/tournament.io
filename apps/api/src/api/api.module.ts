@@ -9,6 +9,7 @@ import { PlayerResolver } from './resolvers/player.resolver';
 import { PlayerService } from './services/player.service';
 import { AuthService } from './services/auth.service';
 import { TournamentController } from './rest/tournament';
+import { MyWebSocketGateway } from './websocket.gateway';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TournamentController } from './rest/tournament';
     }),
   ],
   providers: [
+    MyWebSocketGateway,
     TournamentResolver,
     TournamentService,
     PrismaService,

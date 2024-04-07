@@ -18,4 +18,19 @@ async function getAuthToken() {
   return await clerk.session?.getToken();
 }
 
-export { classNames, getAuthToken };
+async function getUserId() {
+  const isServer = typeof window === 'undefined';
+
+  if (isServer) {
+    const { user } = await auth();
+    if (user) {
+      return user.id;
+    }
+  }
+
+  const clerk = new Clerk(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!);
+  await clerk.load();
+  return clerk.user?.id;
+}
+
+export { classNames, getAuthToken, getUserId };
