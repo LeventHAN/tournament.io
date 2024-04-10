@@ -31,11 +31,9 @@ type Bracket {
   id: String!
   title: String!
   roundIsFinished: Boolean!
-  seed: Seed
+  seeds: [Seed!]!
   winnerPlayer: Player
   winnerPlayerId: String!
-  tournament: Tournament
-  tournamentId: String!
 }
 
 type Tournament {
@@ -57,12 +55,14 @@ scalar JSON
 
 type Query {
   tournament(id: String!): Tournament!
+  tournamentWithBracketsSeedTeams(id: String!): Tournament!
   player(id: String!): Player!
 }
 
 type Mutation {
   addParticipantToTournament(addParticipantToTournamentInput: AddParticipantToTournamentInput!): Tournament!
   removeParticipantFromTournament(removeParticipantFromTournamentInput: RemoveParticipantFromTournamentInput!): Tournament!
+  startTournament(startTournamentInput: StartTournamentInput!): Tournament!
   updateApi(updatePlayerInput: UpdateTournamentInput!): Player!
   removeApi(id: String!): Player!
   createPlayer(createPlayerInput: CreatePlayerInput!): Player!
@@ -74,6 +74,10 @@ input AddParticipantToTournamentInput {
 
 input RemoveParticipantFromTournamentInput {
   tournamentId: String!
+}
+
+input StartTournamentInput {
+  id: String!
 }
 
 input UpdateTournamentInput {

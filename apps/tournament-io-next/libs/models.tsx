@@ -25,6 +25,34 @@ export type ResponseGraphQL<T> = {
   errors: any;
 };
 
+export type TBracket = {
+  id: string;
+  title: string;
+  roundIsFinished: boolean;
+  seeds: {
+    id: string;
+    date: string;
+    teams: {
+      id: string;
+      score: number;
+      players: {
+        id: string;
+        username: string;
+        avatarUrl: string;
+      }[];
+    }[];
+  }[];
+  winnerPlayer: {
+    id: string;
+    username: string;
+    avatarUrl: string;
+  };
+  tournament: {
+    id: string;
+    tournamentName: string;
+  };
+};
+
 export type TCreateTournamentResponse = {
   id: string;
   tournamentHostPlayer: {
@@ -37,20 +65,7 @@ export type TCreateTournamentResponse = {
   currentTournamentBracket: number;
   createdAt: string;
   updatedAt: string;
-  brackets: {
-    id: string;
-    title: string;
-    roundIsFinished: boolean;
-    winnerPlayer: {
-      id: string;
-      username: string;
-      avatarUrl: string;
-    };
-    tournament: {
-      id: string;
-      tournamentName: string;
-    };
-  }[];
+  brackets: TBracket[];
   tournamentParticipants: {
     id: string;
     username: string;
@@ -62,8 +77,18 @@ export type GetTournamentById = {
   tournament: TCreateTournamentResponse;
 };
 
+export type GetTournamentByIdWithBracketsSeed = {
+  tournamentWithBracketsSeedTeams: TCreateTournamentResponse;
+};
+
 export type AddParticipantToTournamentResponse = {
   addParticipantToTournament: {
+    id: string;
+  };
+};
+
+export type StartTournamentResponse = {
+  startTournament: {
     id: string;
   };
 };

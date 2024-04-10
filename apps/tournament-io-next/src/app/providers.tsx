@@ -4,17 +4,20 @@ import { NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import React, { useEffect, useState } from 'react';
 import { socket } from '../socket';
+import { useAuth } from '@clerk/nextjs';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState('N/A');
+
+  const { userId, getToken } = useAuth();
 
   useEffect(() => {
     if (socket.connected) {
       onConnect();
     }
 
-    function onConnect() {
+    async function onConnect() {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
 
@@ -30,6 +33,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+
+    socket.connect();
 
     return () => {
       socket.off('connect', onConnect);
