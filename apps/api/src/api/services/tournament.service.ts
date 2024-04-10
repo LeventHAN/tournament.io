@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
-import { Prisma } from '@prisma/client';
+import { Player } from '@prisma/client';
 
 @Injectable()
 export class TournamentService {
@@ -49,6 +49,112 @@ export class TournamentService {
         tournamentParticipants: {
           disconnect: {
             id: playerId,
+          },
+        },
+      },
+    });
+  }
+
+  async startTournament(tournamentId: string, bracketSize = 2) {
+    const tournamentToUpdate = await this.prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      include: {
+        tournamentParticipants: true,
+        brackets: true,
+      },
+    });
+
+    if (!tournamentToUpdate) {
+      throw new NotFoundException('Tournament not found');
+    }
+
+    const participants = tournamentToUpdate.tournamentParticipants;
+
+    // Pair participants randomly into brackets
+    const randomPairedParticipantsPerBracket = participants
+      .sort(() => 0.5 - Math.random())
+      .reduce((acc, participant, index) => {
+        const bracketIndex = Math.floor(index / bracketSize);
+        if (!acc[bracketIndex]) {
+          acc[bracketIndex] = [];
+        }
+        acc[bracketIndex].push(participant);
+        return acc;
+      }, [] as Player[][]);
+
+    // Create teams for each bracket with connected players and create seeds for each bracket
+    const createdTeams = await Promise.all(
+      randomPairedParticipantsPerBracket.map(
+        async (participants, bracketIndex) => {
+          const createdTeam = await this.prisma.team.create({
+            data: {
+              score: 0,
+              players: {
+                connect: participants.map((participant) => ({
+                  id: participant.id,
+                })),
+              },
+              seed: {
+                create: {},
+              },
+            },
+            include: {
+              seed: true,
+            },
+          });
+          return createdTeam as any;
+        }
+      )
+    );
+
+    // Create brackets for the tournament
+    await this.prisma.bracket.create({
+      data: {
+        title: 'Round 1',
+        roundIsFinished: false,
+        seeds: {
+          connect: createdTeams.map((team) => ({
+            id: team.seedId,
+          })),
+        },
+        tournament: {
+          connect: {
+            id: tournamentId,
+          },
+        },
+      },
+    });
+
+    // Update tournament details
+    return this.prisma.tournament.update({
+      where: { id: tournamentId },
+      include: {
+        brackets: true,
+        tournamentParticipants: true,
+      },
+      data: {
+        currentTournamentBracket: 0,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  findTournamentWithBracketsAndWithItsSeedsAndTeams(tournamentId: string) {
+    return this.prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      include: {
+        tournamentHostPlayer: true,
+        brackets: {
+          include: {
+            seeds: {
+              include: {
+                teams: {
+                  include: {
+                    players: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
