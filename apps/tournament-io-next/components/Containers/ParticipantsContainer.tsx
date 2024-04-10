@@ -9,7 +9,7 @@ import { classNames } from '@/utils/helpers';
 import { useParams } from 'next/navigation';
 import { TCreateTournamentResponse } from '@/libs/models';
 import { useUser } from '@clerk/nextjs';
-import { getTournament } from '../../libs/graphql';
+import { getTournament, startTournament } from '../../libs/graphql';
 import { EditorProvider } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -17,6 +17,7 @@ import ListItem from '@tiptap/extension-list-item';
 import TextStyle from '@tiptap/extension-text-style';
 import { TbGhost } from 'react-icons/tb';
 import { socket } from '../../src/socket';
+import { useRouter } from 'next/navigation';
 
 interface ParticipantsContainerProps {
   // Define your component props here
@@ -34,6 +35,8 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
 }) => {
   const { slug } = useParams();
   const currentLoggedInUser = useUser();
+
+  const router = useRouter();
 
   const [tournamentData, setTournamentData] =
     useState<TCreateTournamentResponse | null>(null);
@@ -73,6 +76,31 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
     }),
   ];
 
+  if (!tournamentData || !currentLoggedInUser.isLoaded)
+    return <div>Loading...</div>;
+
+  const isCurrentUserTournamentParticipant =
+    tournamentData.tournamentParticipants.some(
+      (participant) => participant.id === currentLoggedInUser.user?.id
+    );
+
+  const isCurrentUserHostOfTheTournament =
+    tournamentData.tournamentHostPlayer.id === currentLoggedInUser.user?.id;
+
+  const handleStartTournament = async () => {
+    if (!tournamentData) return;
+    if (!isCurrentUserHostOfTheTournament) return;
+    // Start the tournament
+    const res = await startTournament(tournamentData.id);
+
+    const startedSucceed = !!res?.data?.data?.startTournament?.id;
+
+    if (startedSucceed) {
+      alert('Tournament started');
+      router.push(`/tournament/p/${slug}`);
+    }
+  };
+
   const joinTournament = async () => {
     const status = await handleJoinTournament(slug as string);
     if (status) {
@@ -86,14 +114,6 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
       alert('Participant left the tournament');
     }
   };
-
-  if (!tournamentData || !currentLoggedInUser.isLoaded)
-    return <div>Loading...</div>;
-
-  const isCurrentUserTournamentParticipant =
-    tournamentData.tournamentParticipants.some(
-      (participant) => participant.id === currentLoggedInUser.user?.id
-    );
 
   return (
     // Parent has classname: grid grid-cols-12 gap-4
@@ -221,9 +241,16 @@ const ParticipantsContainer: React.FC<ParticipantsContainerProps> = ({
             </div>
             <div className="order-3">
               <Button
-                className="text-xs md:text-base"
-                onClick={() => alert('bum')}
+                className={classNames(
+                  'text-xs md:text-base',
+                  !isCurrentUserHostOfTheTournament ||
+                    tournamentData.tournamentParticipants.length < 2
+                    ? 'cursor-not-allowed opacity-50'
+                    : ''
+                )}
+                onClick={handleStartTournament}
                 color="success"
+                disabled={!isCurrentUserHostOfTheTournament}
               >
                 <IoRocket />{' '}
                 <span className="hidden sm:block">Start the tournament</span>
