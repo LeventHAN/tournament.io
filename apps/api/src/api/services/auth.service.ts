@@ -27,6 +27,10 @@ export class AuthService {
     }
   }
 
+  async decodeOnly(token: string): Promise<any> {
+    return jwt.decode(token);
+  }
+
   private async getSigningKey(kid: string): Promise<jwksClient.SigningKey> {
     return new Promise((resolve, reject) => {
       this.client.getSigningKey(kid, (err, key) => {
