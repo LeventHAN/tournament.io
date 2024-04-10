@@ -3,8 +3,10 @@ import axios from './axios';
 import {
   AddParticipantToTournamentResponse,
   GetTournamentById,
+  GetTournamentByIdWithBracketsSeed,
   RemoveParticipantToTournamentResponse,
   ResponseGraphQL,
+  StartTournamentResponse,
   TCreateRoomRequest,
   TCreateTournamentResponse,
 } from './models';
@@ -34,8 +36,36 @@ export const getTournament = async (tournamentId: string) => {
             tournamentDescription
             tournamentName
             currentTournamentBracket
-            brackets { id, title, roundIsFinished, winnerPlayer { id, username, avatarUrl }, tournament {id, tournamentName} }
+            brackets { id, title, roundIsFinished, winnerPlayer { id, username, avatarUrl } }
             tournamentParticipants { id, username, avatarUrl }
+            tournamentHostPlayer { id, username, avatarUrl }
+          }
+        }
+      `,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+export const getTournamentWithBracketsWithSeeds = async (
+  tournamentId: string
+) => {
+  return await axios.post<ResponseGraphQL<GetTournamentByIdWithBracketsSeed>>(
+    'http://localhost:3000/graphql',
+    {
+      query: gql`
+        query {
+          tournamentWithBracketsSeedTeams(id: "${tournamentId}") {
+            id
+            createdAt
+            updatedAt
+            tournamentDescription
+            tournamentName
+            currentTournamentBracket
+            brackets { id, title, roundIsFinished, winnerPlayer { id, username, avatarUrl }, seeds { id, date, teams { id, score, players { id, username, avatarUrl } } } }
             tournamentHostPlayer { id, username, avatarUrl }
           }
         }
@@ -119,6 +149,24 @@ export const createPlayer = async () => {
           ) {
             id
           }
+        }
+      `,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+
+export const startTournament = async (tournamentId: string) => {
+  return await axios.post<ResponseGraphQL<StartTournamentResponse>>(
+    'http://localhost:3000/graphql',
+    {
+      query: gql`
+        mutation {
+          startTournament(startTournamentInput: { id: "${tournamentId}" }) { id }
         }
       `,
     },
