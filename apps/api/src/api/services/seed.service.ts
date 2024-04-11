@@ -5,21 +5,23 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SeedService {
   constructor(private prisma: PrismaService) {}
 
-  async updateWinnerSeed(id: string) {
-    throw new Error('Method not implemented.');
-    /*
-    return await this.prisma.seed.update({
-      where: { id },
+  async updateWinnerSeed(id: string, teamId: string, seedId: string) {
+    return this.prisma.seed.update({
+      where: { id: seedId },
       data: {
         teams: {
-          update: {
+          updateMany: {
+            where: {
+              id: teamId,
+            },
             data: {
-              // TODO: WE DO NOT SUPPORT SCORE IN DATABASE. WE SHOULD REWRITE THE TEAMS TO HAVE A WINNER FIELD
+              score: {
+                increment: 1,
+              },
             },
           },
         },
       },
     });
-    */
   }
 }

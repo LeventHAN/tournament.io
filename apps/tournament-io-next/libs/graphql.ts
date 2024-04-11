@@ -190,7 +190,7 @@ export const updateTournamentSeedWinner = async (data: {
     {
       query: gql`
         mutation {
-          updateTournamentSeedWinner(updateTournamentSeedWinnerInput: { id: "${tournamentId}", bracketId: "${data.bracketId}", seedId: "${data.seedId}",  winnerPlayerId: "${data.winnerPlayerId}" }) { id }
+          updateTournamentSeedWinner(updateTournamentSeedWinnerInput: { id: "${data.tournamentId}", bracketId: "${data.bracketId}", seedId: "${data.seedId}",  winnerPlayerId: "${data.winnerPlayerId}" }) { id }
         }
       `,
     },

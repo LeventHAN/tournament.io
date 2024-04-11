@@ -79,11 +79,11 @@ export default function TournamentRoom() {
             return {
               id: seed.id,
               date: seed.date,
-              teams: seed.teams[0].players.map((player) => {
+              teams: seed.teams.map((team) => {
                 return {
-                  id: player.id,
-                  name: player.username,
-                  score: seed.teams[0].score,
+                  id: team.players[0].id,
+                  name: team.players[0].username,
+                  score: team.score,
                 };
               }),
             };

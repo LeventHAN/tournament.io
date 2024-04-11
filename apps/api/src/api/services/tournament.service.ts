@@ -87,19 +87,33 @@ export class TournamentService {
         async (participants, bracketIndex) => {
           const teams = [];
           for (let i = 0; i < participants.length; i += 2) {
+            // for every participant create team
+
             const team1Player = participants[i];
             const team2Player = participants[i + 1];
-            const createTeam = await this.prisma.team.create({
+
+            const createTeam1 = await this.prisma.team.create({
               data: {
                 score: 0,
                 players: {
-                  connect: [{ id: team1Player.id }, { id: team2Player.id }],
+                  connect: [{ id: team1Player.id }],
                 },
                 seed: { create: {} },
               },
               include: { seed: true },
             });
-            teams.push(createTeam);
+
+            const createTeam2 = await this.prisma.team.create({
+              data: {
+                score: 0,
+                players: {
+                  connect: [{ id: team2Player.id }],
+                },
+                seed: { connect: { id: createTeam1.seedId } },
+              },
+              include: { seed: true },
+            });
+            teams.push(createTeam1, createTeam2);
           }
           return teams;
         }

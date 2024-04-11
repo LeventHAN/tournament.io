@@ -43,7 +43,9 @@ export class SeedResolver {
     }
 
     const res = await this.seedService.updateWinnerSeed(
-      updateTournamentSeedWinnerInput.id
+      updateTournamentSeedWinnerInput.id,
+      updateTournamentSeedWinnerInput.bracketId,
+      updateTournamentSeedWinnerInput.seedId
     );
     /*
     this.socketGateway.server.emit('tournament:start', {
