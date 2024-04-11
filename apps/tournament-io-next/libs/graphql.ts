@@ -9,6 +9,7 @@ import {
   StartTournamentResponse,
   TCreateRoomRequest,
   TCreateTournamentResponse,
+  UpdateTournamentSeedWinner,
 } from './models';
 
 export const graphqlFetcher = (query: TODO) =>
@@ -167,6 +168,29 @@ export const startTournament = async (tournamentId: string) => {
       query: gql`
         mutation {
           startTournament(startTournamentInput: { id: "${tournamentId}" }) { id }
+        }
+      `,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};
+
+export const updateTournamentSeedWinner = async (data: {
+  tournamentId: string;
+  bracketId: string;
+  seedId: string;
+  winnerPlayerId: string;
+}) => {
+  return await axios.post<ResponseGraphQL<UpdateTournamentSeedWinner>>(
+    'http://localhost:3000/graphql',
+    {
+      query: gql`
+        mutation {
+          updateTournamentSeedWinner(updateTournamentSeedWinnerInput: { id: "${tournamentId}", bracketId: "${data.bracketId}", seedId: "${data.seedId}",  winnerPlayerId: "${data.winnerPlayerId}" }) { id }
         }
       `,
     },

@@ -3,7 +3,7 @@ import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
-import { Player } from '@prisma/client';
+import { Player, Team } from '@prisma/client';
 
 @Injectable()
 export class TournamentService {
@@ -82,46 +82,38 @@ export class TournamentService {
         return acc;
       }, [] as Player[][]);
 
-    // Create teams for each bracket with connected players and create seeds for each bracket
     const createdTeams = await Promise.all(
       randomPairedParticipantsPerBracket.map(
         async (participants, bracketIndex) => {
-          const createdTeam = await this.prisma.team.create({
-            data: {
-              score: 0,
-              players: {
-                connect: participants.map((participant) => ({
-                  id: participant.id,
-                })),
+          const teams = [];
+          for (let i = 0; i < participants.length; i += 2) {
+            const team1Player = participants[i];
+            const team2Player = participants[i + 1];
+            const createTeam = await this.prisma.team.create({
+              data: {
+                score: 0,
+                players: {
+                  connect: [{ id: team1Player.id }, { id: team2Player.id }],
+                },
+                seed: { create: {} },
               },
-              seed: {
-                create: {},
-              },
-            },
-            include: {
-              seed: true,
-            },
-          });
-          return createdTeam as any;
+              include: { seed: true },
+            });
+            teams.push(createTeam);
+          }
+          return teams;
         }
       )
     );
 
-    // Create brackets for the tournament
     await this.prisma.bracket.create({
       data: {
         title: 'Round 1',
         roundIsFinished: false,
         seeds: {
-          connect: createdTeams.map((team) => ({
-            id: team.seedId,
-          })),
+          connect: createdTeams.map((team) => ({ id: team[0].seedId })),
         },
-        tournament: {
-          connect: {
-            id: tournamentId,
-          },
-        },
+        tournament: { connect: { id: tournamentId } },
       },
     });
 

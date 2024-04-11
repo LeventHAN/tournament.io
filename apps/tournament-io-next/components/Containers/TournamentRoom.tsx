@@ -8,9 +8,12 @@ import {
   SeedItem,
   SeedTeam,
 } from 'react-brackets';
-import { TbArrowRightCircle, TbTournament } from 'react-icons/tb';
+import { TbArrowRightCircle, TbLoader, TbTournament } from 'react-icons/tb';
 import moment from 'moment';
-import { getTournamentWithBracketsWithSeeds } from '../../libs/graphql';
+import {
+  getTournamentWithBracketsWithSeeds,
+  updateTournamentSeedWinner,
+} from '../../libs/graphql';
 import { useParams } from 'next/navigation';
 import { TBracket } from '../../libs/models';
 /*
@@ -52,6 +55,8 @@ export default function TournamentRoom() {
     name: string;
   } | null>(null);
 
+  const [settingWinnerLoading, setSettingWinnerLoading] = useState(0);
+
   const handleTabIndexChange = (index) => () => {
     setTabIndex(index);
   };
@@ -60,73 +65,87 @@ export default function TournamentRoom() {
     setTabIndex(index);
   };
 
-  useEffect(() => {
-    async function fetchTournament() {
-      const tournament = await getTournamentWithBracketsWithSeeds(
-        slug as string
-      );
+  async function fetchTournament() {
+    const tournament = await getTournamentWithBracketsWithSeeds(slug as string);
 
-      if (tournament.data.data.tournamentWithBracketsSeedTeams) {
-        const { brackets } =
-          tournament.data.data.tournamentWithBracketsSeedTeams;
-        const rounds = brackets.map((bracket: TBracket) => {
-          return {
-            id: bracket.id,
-            title: bracket.title,
-            roundIsFinished: bracket.roundIsFinished,
-            seeds: bracket.seeds.map((seed) => {
-              return {
-                id: seed.id,
-                date: seed.date,
-                teams: seed.teams[0].players.map((player) => {
-                  return {
-                    id: player.id,
-                    name: player.username,
-                    score: seed.teams[0].score,
-                  };
-                }),
-              };
-            }),
-          };
-        });
-        setRound(rounds);
-      }
-      console.log({ tournament });
+    if (tournament.data.data.tournamentWithBracketsSeedTeams) {
+      const { brackets } = tournament.data.data.tournamentWithBracketsSeedTeams;
+      const rounds = brackets.map((bracket: TBracket) => {
+        return {
+          id: bracket.id,
+          title: bracket.title,
+          roundIsFinished: bracket.roundIsFinished,
+          seeds: bracket.seeds.map((seed) => {
+            return {
+              id: seed.id,
+              date: seed.date,
+              teams: seed.teams[0].players.map((player) => {
+                return {
+                  id: player.id,
+                  name: player.username,
+                  score: seed.teams[0].score,
+                };
+              }),
+            };
+          }),
+        };
+      });
+      setRound(rounds);
     }
+  }
 
+  useEffect(() => {
     fetchTournament();
   }, []);
 
   const [rounds, setRound] = useState<TODO[]>([]);
 
-  const setWinner = (
+  const calculateGroupNumber = (roundIndex: number, seedIndex: number) => {
+    let index = 1;
+    for (let i = 0; i < roundIndex; i++) {
+      index += rounds[i].seeds.length;
+    }
+    index += seedIndex;
+    return index;
+  };
+
+  // TODO: Currently only supports 1v1 brackets - need to add support for other types of brackets
+  const setWinner = async (
     roundIndex: number,
     seedIndex: number,
     teamIndex: number
   ) => {
     alert('setWinner');
-
-    // if the current round is finished, return
+    setSettingWinnerLoading(calculateGroupNumber(roundIndex, seedIndex));
+    // If the round is already finished, do nothing, do not send anything to the backend
     if (rounds[roundIndex].roundIsFinished) {
+      setSettingWinnerLoading(0);
       return;
     }
 
-    const currentScore =
-      rounds[roundIndex].seeds[seedIndex].teams[teamIndex].score;
-    if (currentScore === 1) {
-      // If it's already set to 1, set both scores to null
-      rounds[roundIndex].seeds[seedIndex].teams.forEach((team) => {
-        team.score = 0;
-      });
-    } else {
-      // Otherwise, set the selected team's score to 1 and the other team's score to 0
-      rounds[roundIndex].seeds[seedIndex].teams.forEach((team, idx) => {
-        team.score = idx === teamIndex ? 1 : 0;
-      });
+    // find the bracket, seed, team and the player inside that won and console log the id and name
+    const bracketId = rounds[roundIndex].id;
+    const seedId = rounds[roundIndex].seeds[seedIndex].id;
+    const winnerPlayerId =
+      rounds[roundIndex].seeds[seedIndex].teams[teamIndex].id;
+
+    const result = await updateTournamentSeedWinner({
+      tournamentId: slug as string,
+      bracketId,
+      seedId,
+      winnerPlayerId,
+    });
+
+    if (result?.data?.data?.updateTournamentSeedWinner) {
+      // TODO: Handle the result
+      console.log(result.data.data.updateTournamentSeedWinner);
     }
-    setRound([...rounds]);
+
+    await fetchTournament(); // refetch the tournament to get the updated data
+    setSettingWinnerLoading(0);
   };
 
+  // TODO: Create on backend
   const createTheSecondRoundForEveryBracket = () => {
     const oldRounds = [...rounds];
     const newRounds = [];
@@ -249,21 +268,22 @@ export default function TournamentRoom() {
     const homeTeam = seed.teams[0];
     const awayTeam = seed.teams[1];
 
-    const calculateBracketIndex = () => {
-      let index = 1;
-      for (let i = 0; i < roundIndex; i++) {
-        index += rounds[i].seeds.length;
-      }
-      index += seedIndex;
-      return index;
-    };
-
     return (
       <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
-        <SeedItem>
+        {settingWinnerLoading ==
+          calculateGroupNumber(roundIndex, seedIndex) && (
+          <TbLoader className="z-10 blur-0 h-10 w-10 animate-spin absolute" />
+        )}
+        <SeedItem
+          className={
+            settingWinnerLoading == calculateGroupNumber(roundIndex, seedIndex)
+              ? 'opacity-50 blur-sm'
+              : ''
+          }
+        >
           <div>
             <span className="font-medium text-sky-400">
-              Group #{calculateBracketIndex()}
+              Group #{calculateGroupNumber(roundIndex, seedIndex)}
             </span>
             <SeedTeam
               style={{
@@ -300,6 +320,7 @@ export default function TournamentRoom() {
     return rounds.map((round) => {
       return (
         <button
+          key={round.id}
           type="button"
           className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           onClick={handleMobileClick(round.id)}
@@ -311,8 +332,8 @@ export default function TournamentRoom() {
   }
 
   return (
-    <div className="App">
-      <div className="visible lg:invisible space-x-2 p-4">
+    <div className="w-full h-full">
+      <div className="visible lg:invisible space-x-2 ">
         <MobileRoundsButton handleMobileClick={handleTabIndexChange} />
       </div>
       <Bracket

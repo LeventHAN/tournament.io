@@ -92,6 +92,11 @@ export type StartTournamentResponse = {
     id: string;
   };
 };
+export type UpdateTournamentSeedWinner = {
+  updateTournamentSeedWinner: {
+    id: string;
+  };
+};
 
 export type RemoveParticipantToTournamentResponse = {
   removeParticipantToTournament: {
