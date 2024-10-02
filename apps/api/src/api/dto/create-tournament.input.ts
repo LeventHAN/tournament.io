@@ -1,7 +1,7 @@
 import graphqlTypeJson from 'graphql-type-json';
 import { InputType, Field } from '@nestjs/graphql';
 import { IsNotEmpty } from 'class-validator';
-import { Prisma } from '@prisma/client';
+import type { JsonArray } from '@prisma/client/runtime/library';
 
 @InputType()
 export class CreateTournamentInput {
@@ -9,7 +9,7 @@ export class CreateTournamentInput {
   name: string;
 
   @Field(() => [graphqlTypeJson], { nullable: true })
-  description: Prisma.JsonArray;
+  description: JsonArray;
 
   @Field(() => String)
   gameType: string;

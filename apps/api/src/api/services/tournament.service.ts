@@ -3,12 +3,13 @@ import { CreateTournamentInput } from '../dto/create-tournament.input';
 import { UpdateTournamentInput } from '../dto/update-tournament.input';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddParticipantToTournamentInput } from '../dto/add-participant-to-tournament.input';
-import { Player, Team } from '@prisma/client';
+import type { Player } from '../entities/player.entity';
 
 @Injectable()
 export class TournamentService {
   constructor(private prisma: PrismaService) {}
   create(createTournamentInput: CreateTournamentInput) {
+    console.log({ createTournamentInput });
     return this.prisma.tournament.create({
       data: {
         tournamentName: createTournamentInput.name,

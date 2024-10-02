@@ -3,6 +3,7 @@ import { Bracket } from './bracket.entity';
 import { Player } from './player.entity';
 import { Prisma } from '@prisma/client';
 import graphqlTypeJson from 'graphql-type-json';
+import type { JsonObject } from '@prisma/client/runtime/library';
 
 @ObjectType()
 export class Tournament {
@@ -13,7 +14,7 @@ export class Tournament {
   tournamentName: string;
 
   @Field(() => graphqlTypeJson, { nullable: true })
-  tournamentDescription: Prisma.InputJsonObject[];
+  tournamentDescription: JsonObject[];
 
   @Field(() => [Bracket])
   brackets: Bracket[];

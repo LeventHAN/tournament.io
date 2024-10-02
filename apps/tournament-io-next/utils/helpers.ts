@@ -13,7 +13,7 @@ async function getAuthToken() {
     return await getToken();
   }
 
-  const clerk = new Clerk(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!);
+  const clerk = new Clerk(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '');
   await clerk.load();
   return await clerk.session?.getToken();
 }
